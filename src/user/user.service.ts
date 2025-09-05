@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDataService } from './user.data-service';
+
 
 @Injectable()
 export class UserService {
@@ -11,19 +11,22 @@ export class UserService {
     return await this.user.create(data);
   }
 
-  async findAll() {
-    return await this.user.findAll();
+  async getUserById(id: number) {
+    try{
+       const user = await this.user.getUserById(id);
+    if (user) {
+      const {  password, ...rest } = user;
+      return rest;
+    }
+    }catch(error){
+       if (error && error.code === 'P2025') {
+         return { message: 'Object with this ID not found' };
+      }
+    }
   }
 
-  async getUser(id: number, email: string) {
-    return await this.user.findOne({id,email});
+  async getUser(email: string) {
+    return await this.user.findOne({ email });
   }
 
-  async updateUser(id: number, data: UpdateUserDto) {
-    return await this.user.updateUser(id, data);
-  }
-
-  async remove(id: number) {
-    return await this.user.deleteUser(id);
-  }
-}
+ }

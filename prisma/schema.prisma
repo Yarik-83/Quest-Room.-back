@@ -22,25 +22,39 @@ model Quest {
   people      String
   time        String
   picture     String
+  minPlayers  Int
+  maxPlayers  Int
   questGenres QuestGenre[]
-}
-
-model QuestGenre {
-  id Int @id @default(autoincrement())
-
-  quest   Quest @relation(fields: [questId], references: [id])
-  questId Int
-
-  genre   Genre @relation(fields: [genreId], references: [id])
-  genreId Int
+  orders      Order[]
 }
 
 model User {
-  id   Int   @id @default(autoincrement())
-  name String
-  email String @unique
-  password String
-  emailVarafied Boolean @default(false)
+  id            Int      @id @default(autoincrement())
+  name          String?
+  email         String?  @unique
+  password      String?
+  phone         String?  @unique
+  createAt      DateTime @default(now())
+  updateAt      DateTime @updatedAt
+  orders        Order[]
+}
+
+model Order {
+  id       Int      @id @default(autoincrement())
+  name     String
+  phone    String
+  person   Int
   createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
+  clientId Int
+  client   User     @relation(fields: [clientId], references: [id])
+  questId  Int
+  quest    Quest    @relation(fields: [questId], references: [id])
+}
+
+model QuestGenre {
+  id      Int   @id @default(autoincrement())
+  quest   Quest @relation(fields: [questId], references: [id])
+  questId Int
+  genre   Genre @relation(fields: [genreId], references: [id])
+  genreId Int
 }

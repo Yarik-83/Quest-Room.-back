@@ -1,6 +1,3 @@
-
-
-
 import { Controller, Post, Get, Body, Delete, Param, Patch } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { CreateGenreDto } from './dto/create-genre.dto';

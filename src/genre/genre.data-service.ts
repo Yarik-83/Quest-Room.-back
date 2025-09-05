@@ -46,19 +46,10 @@ export class GenreDataService {
     return result
   }
 
-    //    linkQuestToGenre(genreId: number, questId: number) {
-    //   return this.prisma.questGenre.create({
-    //     data: {
-    //       genre: { connect: { id: genreId } },
-    //       quest: { connect: { id: questId } },
-    //     },
-    //   });
-    // }
-//==============================
 linkQuestToGenre(genreId: number, questId: number) {
   return this.prisma.questGenre.createMany({
     data: { questId, genreId },
-    skipDuplicates: true,           // ← тихо проігнорує, якщо дубль
+    skipDuplicates: true,           
   });
 }
 

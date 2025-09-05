@@ -1,5 +1,3 @@
-import { Quest } from 'generated/prisma';
-import { IQuest } from 'src/interface';
 
 export interface QuestGenreLink {
   questId: number;

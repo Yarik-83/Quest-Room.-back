@@ -1,10 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { CreateGenreDto } from './dto/create-genre.dto';
-
-import { IGenre, IGenreCreate, IGenreQuery } from './interface';
+import { IGenreCreate, IGenreQuery } from './interface';
 import { GenreDataService } from './genre.data-service';
-import { Prisma } from '@prisma/client';
+
 
 @Injectable()
 export class GenreService {
@@ -44,13 +41,6 @@ export class GenreService {
       throw new Error();
     }
   }
-
-    // linkQuestToGenre(genreId: number, questId: number) {
-  //   const result = this.questGenre.create();
-  //   return result;
-  // }
-
-  //============================
 
   async linkQuestToGenre(genreId: number, questId: number) {
   try {

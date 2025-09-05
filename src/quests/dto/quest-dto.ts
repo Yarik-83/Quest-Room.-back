@@ -1,6 +1,5 @@
 
-
-import { IsString,  } from 'class-validator';
+import { IsNumber, IsString,  } from 'class-validator';
 
 export class CreateQuestDto {
   @IsString() title: string;
@@ -9,5 +8,7 @@ export class CreateQuestDto {
   @IsString() people: string;
   @IsString() time: string;
   @IsString() picture: string;
+  @IsNumber() minPlayers: number;
+  @IsNumber() maxPlayers: number;
 }
 

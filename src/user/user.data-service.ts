@@ -10,31 +10,19 @@ export class UserDataService {
     return await this.prisma.user.create({ data });
   }
 
-  async findAll() {
-    const result = await this.prisma.user.findMany();
-    return result;
-  }
-
-  async findOne(where: {
-    id:number
-    email:string
-  }) {
+  async findOne(where: { email: string }) {
     const result = await this.prisma.user.findUnique({
-      where: where,
+      where: {
+        email: where.email,
+      },
     });
     return result;
   }
 
-  async updateUser(id: number, body: Prisma.UserUpdateInput) {
-    return await this.prisma.user.update({
-      where: { id: id },
-      data: body,
-    });
-  }
-
-  async deleteUser(id: number) {
-    return await this.prisma.user.delete({
+  async getUserById(id: number) {
+    const result = await this.prisma.user.findUnique({
       where: { id: id },
     });
+    return result;
   }
 }

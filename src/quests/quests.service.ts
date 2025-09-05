@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from 'generated/prisma';
 import { QuestDataService } from './quest.data-service';
 import { IQuest } from 'src/interface';
@@ -27,18 +27,15 @@ export class QuestService {
 
   async readQuestById(id: number) {
     const result = await this.quest.readQuestById(id);
-    return result
-      ? {
-          id: result.id,
-          title: result.title,
-          description: result.description,
-          level: result.level,
-          people: result.people,
-          time: result.time,
-          picture: result.picture,
-          genre: result.questGenres.map((g) => g.genre.name),
-        }
-      : { massage: 'Object with this ID not found' };
+    if (!result) {
+      throw new ConflictException('Object with this ID not found');
+    }
+    const { questGenres, ...restUser } = result;
+    const questWithGenre = {
+      ...restUser,
+      genre: result.questGenres.map((g) => g.genre.name),
+    };
+    return questWithGenre;
   }
 
   async update(id: number, body: Prisma.QuestUpdateInput) {
@@ -47,7 +44,7 @@ export class QuestService {
       return quest;
     } catch (error) {
       if (error && error.code === 'P2025') {
-        return { massage: 'Object with this ID not found' };
+        throw new NotFoundException('Object with this ID not found')
       }
       throw error;
     }
@@ -56,10 +53,10 @@ export class QuestService {
   async delete(id: number) {
     try {
       await this.quest.deleteQuest(id);
-      return { massage: 'Object with this ID deleted' };
+      return { message: 'Object with this ID deleted' };
     } catch (error) {
       if (error && error.code === 'P2025') {
-        return { massage: 'Object with this ID not found' };
+        return { message: 'Object with this ID not found' };
       }
       throw error;
     }
