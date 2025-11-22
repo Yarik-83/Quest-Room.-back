@@ -1,9 +1,12 @@
-import { Controller, Post, Get, Body, Delete, Param, Patch } from '@nestjs/common';
+import { Controller, Post, Get, Body, Delete, Param, Patch, SetMetadata } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { LinkQuestToGenreDto } from './dto/link-quest-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
+import { IS_PUBLIC_KEY, Public } from '../decorators/public.decorator';
 
+
+// SetMetadata(IS_PUBLIC_KEY, true)
 @Controller('genres')
 export class GenreController {
   constructor(private readonly genreService: GenreService) {}
@@ -18,9 +21,10 @@ export class GenreController {
     return this.genreService.linkQuestToGenre(dto.genreId, dto.questId);
   }
 
+  @Public()
   @Get()
   findAll() {
-    return this.genreService.findAll();
+    return  this.genreService.findAll();
   }
 
     @Get(':id')
@@ -33,6 +37,7 @@ export class GenreController {
     return this.genreService.update(+id, data);
   }
 
+   @Public()
     @Delete(':id')
   delete(@Param('id') id: string) {
     return this.genreService.deleteGenre(+id);

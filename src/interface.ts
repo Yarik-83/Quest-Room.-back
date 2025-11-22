@@ -4,7 +4,8 @@ export interface IQuest {
   level: string;
   people: string;
   time: string;
-  picture: string;
+  genre: string;
+  // picture: string;
   minPlayers: number;
   maxPlayers: number;
 }
@@ -17,4 +18,14 @@ export interface IJwtPeyload {
   id: number;
   iat: number;
   exp: number;
+}
+
+export interface IBlobFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
+
 }

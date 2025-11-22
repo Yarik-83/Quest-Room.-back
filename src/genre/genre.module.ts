@@ -7,5 +7,6 @@ import { GenreDataService } from './genre.data-service';
 @Module({
   controllers: [GenreController],
   providers: [GenreService,PrismaService,GenreDataService],
+  exports: [GenreService,]
 })
 export class GenreModule {}

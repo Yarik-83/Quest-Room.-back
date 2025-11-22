@@ -7,21 +7,32 @@ import {
   Param,
   Patch,
   SetMetadata,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { QuestService } from './quests.service';
 import { QuestQueryDto } from './dto/quest-query-dto';
 import { CreateQuestDto } from './dto/quest-dto';
 import { IS_PUBLIC_KEY } from 'src/decorators/public.decorator';
+import { StorageService } from 'src/storage/storage.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 @SetMetadata(IS_PUBLIC_KEY, true)
 @Controller('quests')
 export class QuestController {
-  constructor(private readonly questService: QuestService) {}
+  constructor(
+    private readonly questService: QuestService,
+    private readonly storageService: StorageService, //-------?
+
+  ) {}
 
   @Post()
-  create(@Body() dto: CreateQuestDto) {
-    return this.questService.create(dto);
+  @UseInterceptors(FileInterceptor('picture'))
+  create(@Body() dto: CreateQuestDto, @UploadedFile() file: Express.Multer.File) {
+
+    // console.log(dto,file);
+    return this.questService.create(dto,file);
   }
 
   @Get()

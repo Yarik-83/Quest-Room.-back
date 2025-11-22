@@ -1,5 +1,5 @@
-
-import { IsNumber, IsString,  } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
+import { Exclude, Transform } from 'class-transformer';
 
 export class CreateQuestDto {
   @IsString() title: string;
@@ -7,8 +7,11 @@ export class CreateQuestDto {
   @IsString() level: string;
   @IsString() people: string;
   @IsString() time: string;
-  @IsString() picture: string;
-  @IsNumber() minPlayers: number;
-  @IsNumber() maxPlayers: number;
+  @IsString() genre: string;
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  minPlayers: number;
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  maxPlayers: number;
 }
-

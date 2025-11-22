@@ -1,14 +1,56 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from 'generated/prisma';
 import { QuestDataService } from './quest.data-service';
-import { IQuest } from 'src/interface';
+import { IBlobFile, IQuest } from 'src/interface';
+import { StorageService } from 'src/storage/storage.service';
+import { GenreService } from 'src/genre/genre.service';
 
 @Injectable()
 export class QuestService {
-  constructor(private quest: QuestDataService) {}
+  private readonly logger = new Logger(StorageService.name);
+  constructor(
+    private quest: QuestDataService,
+    private storage: StorageService,
+    private genreService: GenreService,
+  ) {}
 
-  create(data: IQuest) {
-    return this.quest.create(data);
+  async create(data: IQuest, file: IBlobFile) {
+    try {
+      const pictureUrl = await this.storage.createBlobFile(file);
+      if (pictureUrl) {
+        const { genre, ...rest } = data;
+        const questToSave = { ...rest, picture: pictureUrl };
+
+        const newQuest = await this.quest.create(questToSave);
+
+        const allGenres = await this.genreService.findAll();
+
+        const findedGenre = allGenres.find(
+          (g) => g.name.toLocaleLowerCase() === genre.toLocaleLowerCase(),
+        );
+
+        if (!findedGenre) {
+          const genreToSave = { name: genre };
+          const newGenre = await this.genreService.create(genreToSave);
+          await this.genreService.linkQuestToGenre(newGenre.id, newQuest.id);
+        } else {
+          await this.genreService.linkQuestToGenre(findedGenre.id, newQuest.id);
+        }
+        return newQuest;
+      }
+      throw new Error("Azure service doesn't work");
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(error.message);
+        throw new InternalServerErrorException();
+      }
+    }
   }
 
   async findAll() {
@@ -21,6 +63,8 @@ export class QuestService {
       people: el.people,
       time: el.time,
       picture: el.picture,
+      minPlayers: el.minPlayers,
+      maxPlayers: el.maxPlayers,
       genre: el.questGenres.map((g) => g.genre.name),
     }));
   }
@@ -44,7 +88,7 @@ export class QuestService {
       return quest;
     } catch (error) {
       if (error && error.code === 'P2025') {
-        throw new NotFoundException('Object with this ID not found')
+        throw new NotFoundException('Object with this ID not found');
       }
       throw error;
     }
