@@ -1,0 +1,72 @@
+export interface IBlobFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
+}
+
+// generator client {
+//   provider = "prisma-client-js"
+//   output   = "../generated/prisma"
+//    engineType   = "client" // enable Prisma ORM without Rust
+// }
+
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+// model Genre {
+//   id          Int          @id @default(autoincrement())
+//   name        String
+//   questGenres QuestGenre[]
+// }
+
+// model Quest {
+//   id          Int          @id @default(autoincrement())
+//   title       String
+//   description String
+//   level       String
+//   people      String
+//   time        String
+//   picture     String
+//   minPlayers  Int
+//   maxPlayers  Int
+//   questGenres QuestGenre[]
+//   orders      Order[]
+// }
+
+// model User {
+//   id            Int      @id @default(autoincrement())
+//   name          String?
+//   email         String?  @unique
+//   password      String?
+//   phone         String?  @unique
+//   createAt      DateTime @default(now())
+//   updateAt      DateTime @updatedAt
+//   orders        Order[]
+// }
+
+// model Order {
+//   id       Int      @id @default(autoincrement())
+//   name     String
+//   phone    String
+//   person   Int
+//   createAt DateTime @default(now())
+//   clientId Int
+//   client   User     @relation(fields: [clientId], references: [id])
+//   questId  Int
+//   quest    Quest    @relation(fields: [questId], references: [id])
+//   status  String    @default("new")
+// }
+
+// model QuestGenre {
+//   id      Int   @id @default(autoincrement())
+//   quest   Quest @relation(fields: [questId], references: [id])
+//   questId Int
+//   genre   Genre @relation(fields: [genreId], references: [id])
+//   genreId Int
+// }

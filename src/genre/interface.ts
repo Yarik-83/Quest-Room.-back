@@ -8,7 +8,7 @@ export interface IGenre {
   name: string;
 }
 
-export interface IGenreCreate {
+export interface  IGenreCreate {
   name: string;
 }
 

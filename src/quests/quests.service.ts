@@ -5,15 +5,15 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from 'generated/prisma';
 import { QuestDataService } from './quest.data-service';
-import { IBlobFile, IQuest } from 'src/interface';
+import { IQuest } from 'src/interface';
 import { StorageService } from 'src/storage/storage.service';
 import { GenreService } from 'src/genre/genre.service';
+import { IBlobFile } from 'src/storage/interface';
 
 @Injectable()
 export class QuestService {
-  private readonly logger = new Logger(StorageService.name);
+  private readonly logger = new Logger(QuestService.name);
   constructor(
     private quest: QuestDataService,
     private storage: StorageService,
@@ -29,19 +29,11 @@ export class QuestService {
 
         const newQuest = await this.quest.create(questToSave);
 
-        const allGenres = await this.genreService.findAll();
+        const genreToSave = { name: genre };
+        const updatedGenre = await this.genreService.create(genreToSave);
 
-        const findedGenre = allGenres.find(
-          (g) => g.name.toLocaleLowerCase() === genre.toLocaleLowerCase(),
-        );
+        await this.genreService.linkQuestToGenre(updatedGenre.id, newQuest.id);
 
-        if (!findedGenre) {
-          const genreToSave = { name: genre };
-          const newGenre = await this.genreService.create(genreToSave);
-          await this.genreService.linkQuestToGenre(newGenre.id, newQuest.id);
-        } else {
-          await this.genreService.linkQuestToGenre(findedGenre.id, newQuest.id);
-        }
         return newQuest;
       }
       throw new Error("Azure service doesn't work");
@@ -82,26 +74,54 @@ export class QuestService {
     return questWithGenre;
   }
 
-  async update(id: number, body: Prisma.QuestUpdateInput) {
+  async update(id: number, body: IQuest, file?: IBlobFile) {
     try {
-      const quest = await this.quest.updateQuest(id, body);
-      return quest;
-    } catch (error) {
-      if (error && error.code === 'P2025') {
-        throw new NotFoundException('Object with this ID not found');
+      const quest = await this.quest.readQuestById(id);
+      if (!quest) throw new NotFoundException('Object with this ID not found');
+      const oldUrl = quest.picture;
+      const { genre, ...restQuest } = body;
+      const oldQuestGenre = quest.questGenres[0]
+      const oldGenreId = oldQuestGenre.id;
+      const oldGenre = await this.genreService.findOne(oldGenreId);
+
+      if (oldGenre?.name.toLocaleLowerCase() !== genre.toLocaleLowerCase()) {
+        const updatedGenre = await this.genreService.create({ name: genre });
+
+        await this.genreService.unlinkQuestFromGenre(
+          oldQuestGenre.questId,
+        );
+        await this.genreService.linkQuestToGenre(updatedGenre.id, quest.id);
+        await this.genreService.cleaningEmptyGenre(
+          oldQuestGenre.genreId,
+        );
       }
+
+      if (file) {
+        const newUrl = await this.storage.updateBlobFile(oldUrl, file);
+        if (!newUrl) {
+          this.logger.error("Azure service doesn't work");
+          throw new InternalServerErrorException();
+        }
+        const questToSave = { ...restQuest, picture: newUrl };
+        return await this.quest.updateQuest(quest.id, questToSave);
+      }
+      return await this.quest.updateQuest(quest.id, restQuest);
+    } catch (error) {
       throw error;
     }
   }
 
   async delete(id: number) {
     try {
-      await this.quest.deleteQuest(id);
-      return { message: 'Object with this ID deleted' };
-    } catch (error) {
-      if (error && error.code === 'P2025') {
-        return { message: 'Object with this ID not found' };
+      const deletedQuest = await this.quest.deleteQuest(id);
+      if (!deletedQuest) {
+        this.logger.error('Object with this ID not found');
+        throw new NotFoundException();
       }
+      const deletedQuestGenreId = deletedQuest.questGenres[0].genreId;
+      await this.genreService.cleaningEmptyGenre(deletedQuestGenreId);
+      await this.storage.deleteBlobFile(deletedQuest.picture);
+    } catch (error) {
       throw error;
     }
   }

@@ -3,10 +3,10 @@ import { GenreService } from './genre.service';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { LinkQuestToGenreDto } from './dto/link-quest-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
-import { IS_PUBLIC_KEY, Public } from '../decorators/public.decorator';
+import { Public } from '../decorators/public.decorator';
 
 
-// SetMetadata(IS_PUBLIC_KEY, true)
+
 @Controller('genres')
 export class GenreController {
   constructor(private readonly genreService: GenreService) {}

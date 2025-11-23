@@ -19,8 +19,9 @@ export class GenreDataService {
   async findUnique(id: number) {
     const result = await this.prisma.genre.findUnique({
       where: {
-        id: id,
+        id: id, 
       },
+      include: { questGenres: { include: { quest: true } } }
     });
     return result;
   }
@@ -51,6 +52,12 @@ linkQuestToGenre(genreId: number, questId: number) {
     data: { questId, genreId },
     skipDuplicates: true,           
   });
+}
+
+unlinkQuestFromGenre( questId: number){
+  return this.prisma.questGenre.deleteMany({
+    where: {questId}
+  })
 }
 
 }

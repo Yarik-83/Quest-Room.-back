@@ -51,6 +51,7 @@ model Order {
   client   User     @relation(fields: [clientId], references: [id])
   questId  Int
   quest    Quest    @relation(fields: [questId], references: [id])
+  status  String    @default("new")
 }
 
 model QuestGenre {

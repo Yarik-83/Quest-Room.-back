@@ -1,5 +1,5 @@
 import { IsNumber, IsString } from 'class-validator';
-import { Exclude, Transform } from 'class-transformer';
+import { Transform } from 'class-transformer';
 
 export class CreateQuestDto {
   @IsString() title: string;

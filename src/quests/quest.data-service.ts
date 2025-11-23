@@ -47,6 +47,7 @@ export class QuestDataService {
   async deleteQuest(id: number) {
     return await this.prisma.quest.delete({
       where: { id: id },
+      include: {questGenres: true}
     });
   }
 }

@@ -11,28 +11,24 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { QuestService } from './quests.service';
-import { QuestQueryDto } from './dto/quest-query-dto';
 import { CreateQuestDto } from './dto/quest-dto';
 import { IS_PUBLIC_KEY } from 'src/decorators/public.decorator';
-import { StorageService } from 'src/storage/storage.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-
 
 @SetMetadata(IS_PUBLIC_KEY, true)
 @Controller('quests')
 export class QuestController {
   constructor(
     private readonly questService: QuestService,
-    private readonly storageService: StorageService, //-------?
-
   ) {}
 
   @Post()
   @UseInterceptors(FileInterceptor('picture'))
-  create(@Body() dto: CreateQuestDto, @UploadedFile() file: Express.Multer.File) {
-
-    // console.log(dto,file);
-    return this.questService.create(dto,file);
+  create(
+    @Body() dto: CreateQuestDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.questService.create(dto, file);
   }
 
   @Get()
@@ -47,8 +43,13 @@ export class QuestController {
   }
 
   @Patch(':id')
-  async updateQuest(@Param('id') id: number, @Body() body: QuestQueryDto) {
-    const newQuest = this.questService.update(id, body);
+  @UseInterceptors(FileInterceptor('picture'))
+  async updateQuest(
+    @Param('id') id: number,
+    @Body() body: CreateQuestDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const newQuest = this.questService.update(id, body, file);
     return newQuest;
   }
 
@@ -58,4 +59,3 @@ export class QuestController {
     return result;
   }
 }
-

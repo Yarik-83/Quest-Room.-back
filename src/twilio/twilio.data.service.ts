@@ -23,34 +23,6 @@ export class TwilioDataService {
       ,update: {}
       ,create:{phone}
     })
-
   }
-
-
-  // async upsertUser(data: Prisma.UserCreateInput) {
-  //   return await this.prisma.user.upsert({
-  //       where: {
-  //   phone: data.phone,
-  // },
- 
-  // create: {
-  //   phone: data.phone,
-  //   smsCode: data.smsCode,
-  // },
-  //   })
-  // }
-
-
-  // async getUserQuests(id: number) {
-  //   return await this.prisma.order.findMany({
-  //     where: {
-  //       clientId:id
-  //     },
-  //     include: {
-  //       quest:true
-  //     }
-  //   });
-  // }
-
-
+  
 }

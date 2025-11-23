@@ -5,10 +5,12 @@ export interface IQuest {
   people: string;
   time: string;
   genre: string;
-  // picture: string;
   minPlayers: number;
   maxPlayers: number;
 }
+
+export interface IUpdateQuest extends Partial<IQuest>{}
+
 export interface IQuestByQuery {
   title?: string;
   description?: string;
@@ -20,12 +22,3 @@ export interface IJwtPeyload {
   exp: number;
 }
 
-export interface IBlobFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  buffer: Buffer;
-
-}
